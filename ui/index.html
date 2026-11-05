@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GMMK Core Mac</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header>
+      <h1>GMMK Core Mac</h1>
+      <p class="subtitle">
+        Clean-room controller for GMMK 2 Full Size 96% (0x320F:0x504B). Protocol
+        aligned with Glorious CORE on Windows.
+      </p>
+    </header>
+
+    <section class="card" id="connection-card">
+      <h2>Connection</h2>
+      <div id="scan-summary">Scanning…</div>
+      <div class="row">
+        <button id="btn-scan" type="button">Rescan USB</button>
+        <button id="btn-connect" type="button" class="primary">Connect</button>
+        <button id="btn-disconnect" type="button">Disconnect</button>
+      </div>
+      <p id="status-line" class="status"></p>
+    </section>
+
+    <section class="card">
+      <h2>Profiles</h2>
+      <div class="row">
+        <button type="button" data-profile="0">Profile 1</button>
+        <button type="button" data-profile="1">Profile 2</button>
+        <button type="button" data-profile="2">Profile 3</button>
+      </div>
+      <label>
+        Layer
+        <select id="layer-select">
+          <option value="0">Layer 1</option>
+          <option value="1">Layer 2</option>
+          <option value="2">Layer 3</option>
+        </select>
+      </label>
+    </section>
+
+    <section class="card">
+      <h2>Lighting</h2>
+      <label>
+        Effect
+        <select id="effect-select"></select>
+      </label>
+      <label>
+        Brightness
+        <input id="brightness" type="range" min="0" max="100" value="100" />
+      </label>
+      <label>
+        Speed
+        <input id="speed" type="range" min="0" max="100" value="50" />
+      </label>
+      <label>
+        Color
+        <input id="color" type="color" value="#ff0000" />
+      </label>
+      <label class="checkbox">
+        <input id="side-light" type="checkbox" checked />
+        Side lighting
+      </label>
+      <button id="btn-apply-light" type="button" class="primary">Apply lighting</button>
+    </section>
+
+    <section class="card">
+      <h2>Performance</h2>
+      <label>
+        Polling rate
+        <select id="polling-select"></select>
+      </label>
+      <button id="btn-apply-polling" type="button" class="primary">Apply polling rate</button>
+    </section>
+
+    <footer>
+      <p>
+        Quit official Glorious CORE before connecting here. Grant
+        <strong>Input Monitoring</strong> for this app in System Settings if HID
+        writes fail.
+      </p>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>

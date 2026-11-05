@@ -1,0 +1,39 @@
+{
+  "name": "gmmk-core-mac",
+  "version": "0.1.0",
+  "description": "Clean-room Glorious CORE–compatible controller for GMMK 2 (96%) on macOS",
+  "main": "electron/main.mjs",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder --mac",
+    "probe": "node scripts/probe-device.mjs"
+  },
+  "build": {
+    "appId": "com.nge1.gmmk-core-mac",
+    "productName": "GMMK Core Mac",
+    "mac": {
+      "category": "public.app-category.utilities",
+      "target": ["dmg"],
+      "entitlements": "electron/entitlements.mac.plist",
+      "entitlementsInherit": "electron/entitlements.mac.plist",
+      "hardenedRuntime": true
+    },
+    "files": [
+      "electron/**/*",
+      "src/**/*",
+      "ui/**/*",
+      "docs/**/*",
+      "scripts/**/*"
+    ]
+  },
+  "dependencies": {
+    "node-hid": "^3.1.2"
+  },
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
+  }
+}
