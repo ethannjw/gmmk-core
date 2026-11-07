@@ -2,6 +2,7 @@ import { app, BrowserWindow, ipcMain } from "electron";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { GmmkDeviceService } from "../src/device-service.mjs";
+import { isSwiftBridgeAvailable, swiftBinaryPath } from "../src/hid/swift-bridge.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const service = new GmmkDeviceService();
@@ -16,17 +17,35 @@ function createWindow() {
     minWidth: 900,
     minHeight: 600,
     title: "GMMK Core Mac",
+    show: false,
     webPreferences: {
-      preload: path.join(__dirname, "preload.mjs"),
+      preload: path.join(__dirname, "preload.cjs"),
       contextIsolation: true,
       nodeIntegration: false,
+      sandbox: false,
     },
   });
+
+  mainWindow.once("ready-to-show", () => {
+    mainWindow?.show();
+  });
+
+  mainWindow.webContents.on("did-fail-load", (_evt, code, desc, url) => {
+    console.error("did-fail-load", code, desc, url);
+  });
+
+  if (process.env.GMMK_DEBUG === "1") {
+    mainWindow.webContents.openDevTools({ mode: "detach" });
+  }
 
   mainWindow.loadFile(path.join(__dirname, "../ui/index.html"));
 }
 
 app.whenReady().then(() => {
+  console.log(
+    "HID bridge:",
+    isSwiftBridgeAvailable() ? swiftBinaryPath() : "missing (run npm run build:hid)",
+  );
   createWindow();
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {
@@ -42,11 +61,20 @@ app.on("window-all-closed", () => {
   }
 });
 
+process.on("uncaughtException", (err) => {
+  console.error("uncaughtException", err);
+});
+
+process.on("unhandledRejection", (err) => {
+  console.error("unhandledRejection", err);
+});
+
 ipcMain.handle("gmmk:scan", () => service.scan());
 
-ipcMain.handle("gmmk:connect", () => {
+ipcMain.handle("gmmk:connect", async () => {
   try {
-    return { ok: true, info: service.connect(), state: service.getState() };
+    const info = await service.connect();
+    return { ok: true, info, state: service.getState() };
   } catch (err) {
     return { ok: false, error: err instanceof Error ? err.message : String(err) };
   }
@@ -62,6 +90,7 @@ ipcMain.handle("gmmk:state", () => service.getState());
 ipcMain.handle("gmmk:meta", () => ({
   effects: service.getEffectLabels(),
   pollingRates: service.getPollingRates(),
+  swiftBridge: isSwiftBridgeAvailable(),
 }));
 
 ipcMain.handle("gmmk:update-settings", (_evt, patch) => {

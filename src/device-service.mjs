@@ -13,6 +13,7 @@ export class GmmkDeviceService {
   #transport = new GmmkHidTransport();
   #state = {
     connected: false,
+    backend: null,
     profileIndex: 0,
     layerIndex: 0,
     pollingHz: 1000,
@@ -23,19 +24,21 @@ export class GmmkDeviceService {
     sideLightOn: true,
   };
 
-  scan() {
+  async scan() {
     return scanDevices();
   }
 
-  connect() {
-    const info = this.#transport.connect();
+  async connect() {
+    const info = await this.#transport.connect();
     this.#state.connected = true;
+    this.#state.backend = info.backend;
     return info;
   }
 
   disconnect() {
     this.#transport.close();
     this.#state.connected = false;
+    this.#state.backend = null;
   }
 
   getState() {
@@ -52,7 +55,7 @@ export class GmmkDeviceService {
 
   async applyPollingRate(hz) {
     const packet = buildPollingRatePacket(hz);
-    this.#transport.sendFeatureReport(packet);
+    await this.#transport.sendFeatureReport(packet);
     this.#state.pollingHz = hz;
     await sleep(100);
   }
@@ -65,7 +68,7 @@ export class GmmkDeviceService {
       brightness: this.#state.brightness,
       sideLightOn: this.#state.sideLightOn,
     });
-    this.#transport.sendFeatureReport(typePacket);
+    await this.#transport.sendFeatureReport(typePacket);
     await sleep(100);
 
     const effectPacket = buildLedEffectPacket({
@@ -74,13 +77,13 @@ export class GmmkDeviceService {
       brightness: this.#state.brightness,
       rgb: this.#state.rgb,
     });
-    this.#transport.sendFeatureReport(effectPacket);
+    await this.#transport.sendFeatureReport(effectPacket);
     await sleep(100);
   }
 
   async switchProfile(profileIndex, layerIndex = 0) {
     const packet = buildChangeProfilePacket(profileIndex, layerIndex);
-    this.#transport.sendFeatureReport(packet);
+    await this.#transport.sendFeatureReport(packet);
     this.#state.profileIndex = profileIndex;
     this.#state.layerIndex = layerIndex;
     await sleep(100);

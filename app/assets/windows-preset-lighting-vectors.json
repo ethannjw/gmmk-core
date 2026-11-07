@@ -1,0 +1,76 @@
+{
+  "reference_version": "CORE 2.1.23.2",
+  "main_sha256": "96e373835ce225da34c974c9200e75e737048719ba6c6cb674c511be7c4a0531",
+  "report_size": 264,
+  "effects": [
+    { "identifier": "LEDOFF", "local_id": 8, "wire_id": 0 },
+    { "identifier": "GloriousMode", "local_id": 0, "wire_id": 1 },
+    { "identifier": "Wave1", "local_id": 1, "wire_id": 2 },
+    { "identifier": "Wave2", "local_id": 3, "wire_id": 3 },
+    { "identifier": "SpiralingWave", "local_id": 4, "wire_id": 4 },
+    { "identifier": "AcidMode", "local_id": 5, "wire_id": 5 },
+    { "identifier": "Breathing", "local_id": 2, "wire_id": 6 },
+    { "identifier": "NormallyOn", "local_id": 6, "wire_id": 7 },
+    { "identifier": "RippleGraff", "local_id": 7, "wire_id": 8 },
+    { "identifier": "PassWithoutTrace", "local_id": 9, "wire_id": 9 },
+    { "identifier": "FastRunWithoutTrace", "local_id": 10, "wire_id": 10 },
+    { "identifier": "Matrix2", "local_id": 11, "wire_id": 11 },
+    { "identifier": "Matrix3", "local_id": 12, "wire_id": 12 },
+    { "identifier": "Rainbow", "local_id": 13, "wire_id": 13 },
+    { "identifier": "HeartbeatSensor", "local_id": 14, "wire_id": 14 },
+    { "identifier": "DigitalTimes", "local_id": 15, "wire_id": 15 },
+    { "identifier": "Kamehemeha", "local_id": 16, "wire_id": 16 },
+    { "identifier": "Pingpong", "local_id": 17, "wire_id": 17 },
+    { "identifier": "Surmount", "local_id": 18, "wire_id": 18 }
+  ],
+  "samples": [
+    {
+      "name": "minimum-custom", "profile": 0, "layer": 0,
+      "speed": 0, "brightness": 0, "rgb": [0, 0, 0], "latency": 2, "multicolor": false,
+      "properties_prefix": [7, 7, 1, 1, 0, 0, 1, 0, 0, 0, 2],
+      "effect_prefix": [7, 2, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    },
+    {
+      "name": "minimum-chromatic", "profile": 0, "layer": 0,
+      "speed": 0, "brightness": 0, "rgb": [0, 0, 0], "latency": 2, "multicolor": true,
+      "properties_prefix": [7, 7, 1, 1, 0, 0, 1, 0, 0, 0, 2],
+      "effect_prefix": [7, 2, 0, 0, 0, 0, 0, 0, 100, 0, 1, 0, 1, 0, 0, 0, 0, 0]
+    },
+    {
+      "name": "fractional-brightness-custom", "profile": 1, "layer": 2,
+      "speed": 1, "brightness": 4, "rgb": [1, 2, 255], "latency": 8, "multicolor": false,
+      "properties_prefix": [7, 7, 2, 3, 0, 0, 1, 0, 0, 0, 8],
+      "effect_prefix": [7, 2, 0, 0, 0, 0, 0, 0, 99, 0, 0, 0, 0, 0, 0, 1, 2, 255]
+    },
+    {
+      "name": "fractional-brightness-chromatic", "profile": 1, "layer": 2,
+      "speed": 1, "brightness": 4, "rgb": [1, 2, 255], "latency": 8, "multicolor": true,
+      "properties_prefix": [7, 7, 2, 3, 0, 0, 1, 0, 0, 0, 8],
+      "effect_prefix": [7, 2, 0, 0, 0, 0, 0, 0, 99, 0, 1, 0, 1, 0, 0, 1, 2, 255]
+    },
+    {
+      "name": "intermediate-custom", "profile": 2, "layer": 1,
+      "speed": 50, "brightness": 63, "rgb": [17, 34, 51], "latency": 16, "multicolor": false,
+      "properties_prefix": [7, 7, 3, 2, 0, 0, 1, 0, 12, 0, 16],
+      "effect_prefix": [7, 2, 0, 0, 0, 0, 0, 0, 50, 12, 0, 0, 0, 0, 0, 17, 34, 51]
+    },
+    {
+      "name": "intermediate-chromatic", "profile": 2, "layer": 1,
+      "speed": 50, "brightness": 63, "rgb": [17, 34, 51], "latency": 16, "multicolor": true,
+      "properties_prefix": [7, 7, 3, 2, 0, 0, 1, 0, 12, 0, 16],
+      "effect_prefix": [7, 2, 0, 0, 0, 0, 0, 0, 50, 12, 1, 0, 1, 0, 0, 17, 34, 51]
+    },
+    {
+      "name": "maximum-custom", "profile": 2, "layer": 2,
+      "speed": 100, "brightness": 100, "rgb": [255, 0, 127], "latency": 2, "multicolor": false,
+      "properties_prefix": [7, 7, 3, 3, 0, 0, 1, 0, 20, 0, 2],
+      "effect_prefix": [7, 2, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 255, 0, 127]
+    },
+    {
+      "name": "maximum-chromatic", "profile": 2, "layer": 2,
+      "speed": 100, "brightness": 100, "rgb": [255, 0, 127], "latency": 2, "multicolor": true,
+      "properties_prefix": [7, 7, 3, 3, 0, 0, 1, 0, 20, 0, 2],
+      "effect_prefix": [7, 2, 0, 0, 0, 0, 0, 0, 0, 20, 1, 0, 1, 0, 0, 255, 0, 127]
+    }
+  ]
+}

@@ -6,10 +6,13 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "start": "electron .",
+    "start": "(npm run build:hid || true) && electron .",
+    "permissions": "open 'x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension?Privacy_ListeningEvent'",
+    "build:hid": "swiftc -O native/hid_gmmk.swift -o native/hid-gmmk",
+    "postinstall": "npm run build:hid || true",
     "pack": "electron-builder --dir",
-    "dist": "electron-builder --mac",
-    "probe": "node scripts/probe-device.mjs"
+    "dist": "npm run build:hid && electron-builder --mac",
+    "probe": "npm run build:hid && node scripts/probe-device.mjs"
   },
   "build": {
     "appId": "com.nge1.gmmk-core-mac",

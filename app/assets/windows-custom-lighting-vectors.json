@@ -1,0 +1,50 @@
+{
+  "main_sha256": "96e373835ce225da34c974c9200e75e737048719ba6c6cb674c511be7c4a0531",
+  "renderer_sha256": "9b8adecdf2957e81d2d6e674af5b6759c138565612d8cbadd67c8049d9c2f4ed",
+  "side_led_indices": [120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139],
+  "breathing_toggle": {
+    "track_size": [48,24],
+    "handle_size": 16,
+    "handle_travel": 22,
+    "transition_ms": 300,
+    "transition_easing": "ease",
+    "label_gap": 8,
+    "font_size": 12,
+    "track_fill": "#111111",
+    "track_border": "#909090",
+    "handle_fill": "#262626",
+    "handle_border": "#d9d9d9",
+    "selected": "#ffa40d",
+    "hover_fill": "#313131",
+    "hover_accent": "#feead2",
+    "focus": "#56b7e6"
+  },
+  "selector": {
+    "columns": 4,
+    "button_size": [110,32],
+    "gap": 15,
+    "button_margin_left": 8,
+    "border_radius": 30,
+    "header_gap": 5,
+    "font_size": 12,
+    "header_font_size": 14,
+    "background": "#262626",
+    "foreground": "#d9d9d9",
+    "header_foreground": "#f5f5f5"
+  },
+  "groups": [
+    {"id":0,"label":"WASD","component_count":4,"indices":[42,61,62,63]},
+    {"id":5,"label":"Arrows","component_count":4,"indices":[93,112,113,114]},
+    {"id":4,"label":"F Keys","component_count":12,"indices":[1,2,3,4,5,6,7,8,9,10,11,12]},
+    {"id":3,"label":"Modifiers","component_count":7,"indices":[80,92,100,101,102,109,111]},
+    {"id":6,"label":"Alphas","component_count":26,"indices":[41,42,43,44,45,46,47,48,49,50,61,62,63,64,65,66,67,68,69,82,83,84,85,86,87,88]},
+    {"id":1,"label":"Numbers","component_count":10,"indices":[21,22,23,24,25,26,27,28,29,30]},
+    {"id":2,"label":"Side Lights","component_count":0,"indices":[]},
+    {"id":8,"label":"All","component_count":100,"indices":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,60,61,62,63,64,65,66,67,68,69,70,71,73,74,75,76,77,80,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,100,101,102,105,109,110,111,112,113,114,115,116,117,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139]}
+  ],
+  "samples": [
+    {"rgb":[12,34,56],"breathing":false},
+    {"rgb":[254,255,254],"breathing":true},
+    {"rgb":[0,0,0],"breathing":false}
+  ]
+}

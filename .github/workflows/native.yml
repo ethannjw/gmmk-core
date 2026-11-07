@@ -1,0 +1,65 @@
+name: Native checks
+
+"on":
+  push:
+    paths:
+      - "app/**"
+      - ".github/workflows/native.yml"
+  pull_request:
+    paths:
+      - "app/**"
+      - ".github/workflows/native.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: native-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native:
+    name: Test and build (${{ matrix.runner }})
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-24.04, macos-15, macos-15-intel]
+    defaults:
+      run:
+        shell: bash
+        working-directory: app
+    env:
+      CARGO_TERM_COLOR: always
+      RUST_BACKTRACE: "1"
+      RUST_VERSION: "1.99.1"
+    steps:
+      - name: Check out source (checkout v6.0.2)
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+      - name: Set up Node.js for research-tool tests (setup-node v4.4.0)
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22"
+      - name: Test bounded HID trace recorder
+        run: node --test scripts/windows-hid-trace.test.cjs
+      - name: Install Linux build dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends \
+            pkg-config libudev-dev libxkbcommon-dev libwayland-dev \
+            libx11-dev libxi-dev libxrandr-dev libxcursor-dev libgl1-mesa-dev
+      - name: Select the verified Rust toolchain
+        run: |
+          rustup toolchain install "$RUST_VERSION" --profile minimal
+          rustup default "$RUST_VERSION"
+          rustc --version --verbose
+          cargo --version
+      - name: Test native behavior and reference vectors
+        run: cargo test --locked
+      - name: Build optimized native application
+        run: cargo build --release --locked

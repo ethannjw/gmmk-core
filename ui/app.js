@@ -1,5 +1,3 @@
-/** @typedef {import('../electron/preload.mjs')} GmmkApi */
-
 const statusLine = document.getElementById("status-line");
 const scanSummary = document.getElementById("scan-summary");
 const effectSelect = document.getElementById("effect-select");
@@ -10,10 +8,29 @@ function setStatus(text, kind = "") {
   statusLine.className = `status ${kind}`;
 }
 
+async function bootstrap() {
+  if (!window.gmmk) {
+    scanSummary.textContent = "Preload failed — window.gmmk is missing.";
+    setStatus(
+      "Electron preload did not load. Restart with npm start from ~/myapps/gmmk-core-mac.",
+      "error",
+    );
+    return;
+  }
+
+  try {
+    await loadMeta();
+    await refreshScan();
+  } catch (err) {
+    setStatus(err instanceof Error ? err.message : String(err), "error");
+  }
+}
+
 async function refreshScan() {
   const scan = await window.gmmk.scan();
-  const found = scan.configPath ? "vendor interface found" : "vendor interface missing";
-  scanSummary.textContent = `${scan.product ?? "No device"} — VID 0x${scan.vid.toString(16)} PID 0x${scan.pid.toString(16)} — ${found}`;
+  const bridge = scan.swiftBridge ? "IOKit bridge ready" : "IOKit bridge missing (npm run build:hid)";
+  const found = scan.configPath || scan.swiftScan?.ok ? "vendor interface found" : "vendor interface missing";
+  scanSummary.textContent = `${scan.product ?? "No device"} — VID 0x${scan.vid.toString(16)} PID 0x${scan.pid.toString(16)} — ${found} — ${bridge}`;
 }
 
 async function loadMeta() {
@@ -54,7 +71,7 @@ document.getElementById("btn-scan").addEventListener("click", () => refreshScan(
 document.getElementById("btn-connect").addEventListener("click", async () => {
   const res = await window.gmmk.connect();
   if (res.ok) {
-    setStatus(`Connected (${res.info.product})`, "ok");
+    setStatus(`Connected via ${res.info.backend} (${res.info.product})`, "ok");
     await syncControlsFromState();
   } else {
     setStatus(res.error ?? "Connect failed", "error");
@@ -71,7 +88,10 @@ document.querySelectorAll("[data-profile]").forEach((btn) => {
     const profileIndex = Number(btn.getAttribute("data-profile"));
     const layerIndex = Number(document.getElementById("layer-select").value);
     const res = await window.gmmk.switchProfile(profileIndex, layerIndex);
-    setStatus(res.ok ? `Profile ${profileIndex + 1} layer ${layerIndex + 1}` : res.error, res.ok ? "ok" : "error");
+    setStatus(
+      res.ok ? `Profile ${profileIndex + 1} layer ${layerIndex + 1}` : res.error,
+      res.ok ? "ok" : "error",
+    );
   });
 });
 
@@ -94,4 +114,4 @@ document.getElementById("btn-apply-polling").addEventListener("click", async () 
   setStatus(res.ok ? `Polling ${hz} Hz` : res.error, res.ok ? "ok" : "error");
 });
 
-loadMeta().then(refreshScan);
+bootstrap();

@@ -1,28 +1,30 @@
 #!/usr/bin/env node
-import { scanDevices, GmmkHidTransport } from "../src/hid/transport.mjs";
+import { scanDevices } from "../src/hid/transport.mjs";
 import { buildPollingRatePacket } from "../src/protocol/gmmk-v2-96.mjs";
+import { GmmkDeviceService } from "../src/device-service.mjs";
 
-const scan = scanDevices();
+const scan = await scanDevices();
 console.log(JSON.stringify(scan, null, 2));
 
-if (!scan.configPath) {
+if (!scan.configPath && !scan.swiftScan?.ok) {
   console.error("No config interface; is the keyboard connected?");
   process.exit(1);
 }
 
-const transport = new GmmkHidTransport();
+const service = new GmmkDeviceService();
 try {
-  const info = transport.connect();
-  console.log("Opened", info);
+  const info = await service.connect();
+  console.log("Connected", info);
+  await service.applyPollingRate(1000);
+  console.log("Polling packet OK");
   const packet = buildPollingRatePacket(1000);
-  const sent = transport.sendFeatureReport(packet);
-  console.log("Polling packet bytes sent:", sent);
+  console.log("Sample packet head:", [...packet.slice(0, 12)]);
 } catch (err) {
   console.error("HID error:", err instanceof Error ? err.message : err);
   console.error(
-    "If you see IOHIDDeviceSetReport or 'not permitted', run from the built .app and grant Input Monitoring.",
+    "Grant Input Monitoring to native/hid-gmmk and Electron, quit Glorious CORE, then retry.",
   );
   process.exit(2);
 } finally {
-  transport.close();
+  service.disconnect();
 }

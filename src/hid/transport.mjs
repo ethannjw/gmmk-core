@@ -1,5 +1,6 @@
 import HID from "node-hid";
 import { GMMK2_96_US } from "../protocol/gmmk-v2-96.mjs";
+import { isSwiftBridgeAvailable, swiftBinaryPath, swiftRequest } from "./swift-bridge.mjs";
 
 /**
  * @param {number} vid
@@ -17,26 +18,69 @@ export class GmmkHidTransport {
   #handle = null;
   /** @type {string | null} */
   #path = null;
+  /** @type {"swift" | "node-hid" | null} */
+  #backend = null;
+  #product = null;
+
+  get backend() {
+    return this.#backend;
+  }
 
   /**
-   * @param {{ vid?: number, pid?: number }} [opts]
+   * @param {{ vid?: number, pid?: number, preferSwift?: boolean }} [opts]
    */
-  connect(opts = {}) {
+  async connect(opts = {}) {
     const vid = opts.vid ?? GMMK2_96_US.vid;
     const pid = opts.pid ?? GMMK2_96_US.pid;
+    const preferSwift = opts.preferSwift ?? true;
+
+    this.close();
+
+    if (preferSwift && isSwiftBridgeAvailable()) {
+      const res = await swiftRequest({
+        op: "scan",
+        vid,
+        pid,
+        usagePage: GMMK2_96_US.setInterface.usagePage,
+        usage: GMMK2_96_US.setInterface.usage,
+      });
+      if (!res.ok) {
+        throw new Error(res.error ?? "Swift HID scan failed");
+      }
+      this.#backend = "swift";
+      this.#path = swiftBinaryPath();
+      this.#product = res.product ?? null;
+      return {
+        path: this.#path,
+        product: this.#product,
+        backend: this.#backend,
+      };
+    }
+
     const iface = listMatchingInterfaces(vid, pid, GMMK2_96_US.setInterface)[0];
     if (!iface?.path) {
+      const hint = isSwiftBridgeAvailable()
+        ? ""
+        : " Run `npm run build:hid` for the macOS IOKit bridge.";
       throw new Error(
-        `GMMK vendor interface not found (VID ${vid.toString(16)} PID ${pid.toString(16)} usage FF01:01). Is the keyboard plugged in?`,
+        `GMMK vendor interface not found (VID ${vid.toString(16)} PID ${pid.toString(16)} usage FF01:01). Is the keyboard plugged in?${hint}`,
       );
     }
-    this.close();
     this.#path = iface.path;
-    this.#handle = new HID.HID(iface.path);
+    try {
+      this.#handle = new HID.HID(iface.path);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      throw new Error(
+        `${message}. Quit Glorious CORE and allow Input Monitoring for Electron (dev) or GMMK Core Mac (packaged app).`,
+      );
+    }
+    this.#backend = "node-hid";
+    this.#product = iface.product ?? null;
     return {
       path: iface.path,
-      product: iface.product,
-      manufacturer: iface.manufacturer,
+      product: this.#product,
+      backend: this.#backend,
     };
   }
 
@@ -47,13 +91,15 @@ export class GmmkHidTransport {
       } catch {
         /* ignore */
       }
-      this.#handle = null;
-      this.#path = null;
     }
+    this.#handle = null;
+    this.#path = null;
+    this.#backend = null;
+    this.#product = null;
   }
 
   get isOpen() {
-    return this.#handle !== null;
+    return this.#backend !== null;
   }
 
   get path() {
@@ -63,11 +109,32 @@ export class GmmkHidTransport {
   /**
    * @param {Buffer} report Buffer whose byte 0 is report ID (7)
    */
-  sendFeatureReport(report) {
+  async sendFeatureReport(report) {
+    if (!this.isOpen) {
+      throw new Error("Device not connected");
+    }
+    if (this.#backend === "swift") {
+      const res = await swiftRequest({
+        op: "setFeature",
+        data: [...report],
+        reportSize: GMMK2_96_US.reportSize,
+      });
+      if (!res.ok) {
+        throw new Error(res.error ?? "setFeature failed");
+      }
+      return res.sent ?? report.length;
+    }
     if (!this.#handle) {
       throw new Error("Device not connected");
     }
-    return this.#handle.sendFeatureReport(report);
+    try {
+      return this.#handle.sendFeatureReport(report);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      throw new Error(
+        `${message}. Try: npm run build:hid, quit Glorious CORE, grant Input Monitoring.`,
+      );
+    }
   }
 
   /**
@@ -76,7 +143,7 @@ export class GmmkHidTransport {
    */
   getFeatureReport(reportSize = GMMK2_96_US.reportSize) {
     if (!this.#handle) {
-      throw new Error("Device not connected");
+      throw new Error("Get feature report requires node-hid backend");
     }
     return this.#handle.getFeatureReport(GMMK2_96_US.reportId, reportSize);
   }
@@ -85,15 +152,33 @@ export class GmmkHidTransport {
 /**
  * @param {{ vid?: number, pid?: number }} [opts]
  */
-export function scanDevices(opts = {}) {
+export async function scanDevices(opts = {}) {
   const vid = opts.vid ?? GMMK2_96_US.vid;
   const pid = opts.pid ?? GMMK2_96_US.pid;
   const all = HID.devices(vid, pid);
   const setIface = listMatchingInterfaces(vid, pid, GMMK2_96_US.setInterface)[0];
   const getIface = listMatchingInterfaces(vid, pid, GMMK2_96_US.getInterface)[0];
+
+  let swiftScan = null;
+  if (isSwiftBridgeAvailable()) {
+    try {
+      swiftScan = await swiftRequest({
+        op: "scan",
+        vid,
+        pid,
+        usagePage: GMMK2_96_US.setInterface.usagePage,
+        usage: GMMK2_96_US.setInterface.usage,
+      });
+    } catch {
+      swiftScan = null;
+    }
+  }
+
   return {
     vid,
     pid,
+    swiftBridge: isSwiftBridgeAvailable(),
+    swiftScan,
     interfaces: all.map((d) => ({
       path: d.path,
       usagePage: d.usagePage,
@@ -102,6 +187,6 @@ export function scanDevices(opts = {}) {
     })),
     configPath: setIface?.path ?? null,
     notifyPath: getIface?.path ?? null,
-    product: setIface?.product ?? all[0]?.product ?? null,
+    product: swiftScan?.product ?? setIface?.product ?? all[0]?.product ?? null,
   };
 }

@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "scope": "no-device validation",
+  "observedAt": "2026-11-07T11:38:54.531Z",
+  "physicalAccessApproved": false,
+  "hardwareReadbackVerified": false,
+  "guest": {
+    "coreVersion": "2.1.23",
+    "packageVersion": "2.1.23.2",
+    "processArchitecture": "x64",
+    "fridaVersion": "17.26.1"
+  },
+  "probe": {
+    "stage": "probe-finished",
+    "passed": true,
+    "durationMs": 20000,
+    "hookErrors": 0,
+    "callbackErrors": 0,
+    "unmatchedImports": [],
+    "journalDropped": 0,
+    "journalError": null,
+    "hooksDetached": true,
+    "selfTest": {
+      "passed": true,
+      "checks": [
+        "target-handle-registration",
+        "ioctl-input-exact-65",
+        "ioctl-output-count",
+        "failed-output-and-last-error",
+        "unrelated-handle-filter",
+        "pending-output-not-read",
+        "incomplete-retains-pending",
+        "overlapped-completion-output",
+        "completion-before-issuer-return",
+        "readfile-output-count",
+        "timeout-retains-pending",
+        "alertable-wait-retains-pending",
+        "cancelled-read-no-output",
+        "writefile-input-only",
+        "HidD_GetFeature",
+        "HidD_GetInputReport",
+        "HidD_SetFeature",
+        "HidD_SetOutputReport",
+        "close-abandons-pending",
+        "ansi-open"
+      ]
+    },
+    "importedApiSmoke": {
+      "passed": true,
+      "api": "DeviceIoControl",
+      "handle": "INVALID_HANDLE_VALUE",
+      "controlCode": "0x000b0192",
+      "inputLength": 65,
+      "result": false,
+      "error": 6,
+      "successfulHardwareResponse": false
+    }
+  },
+  "passiveObservation": {
+    "hookAddresses": 18,
+    "nativeModuleInventories": 4,
+    "observedImportedApiNames": [
+      "CloseHandle",
+      "CreateFileW",
+      "DeviceIoControl",
+      "GetOverlappedResult",
+      "ReadFile",
+      "WriteFile"
+    ],
+    "emitted": 0,
+    "dropped": 0,
+    "pendingAtStop": 0
+  },
+  "postProbeVerification": {
+    "physicalTargetCount": 0,
+    "fridaProcessCount": 0,
+    "researchTaskCount": 0,
+    "coreProcessCount": 4,
+    "asarUnchanged": true
+  },
+  "sha256": {
+    "installedAsar": "64e3de1cdec77fba29a9db3313ec945c89dd34c22ad5f8609ec1b125ad67c7b2",
+    "generatedProbe": "7ad3f433e7d0b36319f1ce89e2da89909b6e439c32693002be0b27bf07633be0",
+    "rawJournal": "8078482629dcb2f193c170168576efe8e34a68510f7f156ab02ccafec53bcbf4",
+    "sourcesRelativeToApp": {
+      "scripts/windows-hid-trace.cjs": "b12de15928549cf31c50e63047b53be679a98a70afed470a623f63df99429757",
+      "scripts/windows-hid-trace.frida.js": "5f374c22491fc962e08bc259e58801e8a0750773d73f51dd6cb00034f18cf473",
+      "scripts/windows-hid-trace-selftest.frida.js": "0c55470455d91dd999630b7c39c261f634a7a040ccca24877da559c44b0695c8",
+      "scripts/build-windows-hid-trace.cjs": "91f7ac34ecc2281cdfc1e2e9ec908e90c467ea48da58384f3608aaa2306596dd",
+      "scripts/windows-hid-trace.test.cjs": "e3f678745b5c07c5652a3eb41af7f6627dc4447719bcd98d0731ca474365e700"
+    }
+  },
+  "limitations": [
+    "Historical sanitized result summary, not a live test or full raw journal.",
+    "Passing applies to this isolated probe and the hashed source versions only.",
+    "No physical keyboard request, successful HID response, or onboard settings download verified.",
+    "Import coverage applies to six observed API names in four modules, not all native control flow.",
+    "UI parity, hardware acceptance, and release readiness remain unverified."
+  ]
+}
